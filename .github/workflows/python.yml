@@ -43,7 +43,7 @@ jobs:
         echo "\n${BLUE}Running Bandit against source files...${NC}\n"
         bandit -r --ini setup.cfg
 
-    - name: Test input variabel
-      run: echo "${{ inputs.username }}"
-      with:
-        username: ${{ inputs.username }}
+    - name: Test input variable
+      run: echo "Hello"
+#      with:
+#        username: ${{ inputs.username }}
