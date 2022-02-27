@@ -3,10 +3,6 @@ name: Python CI job
 on:
   workflow_call:
     # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#onworkflow_callinputs
-    inputs:
-      username:
-        required: true
-        type: string
 
 jobs:
   python-ci:
@@ -22,13 +18,14 @@ jobs:
         python-version: ${{ matrix.python }}
 
     # TODO Make this work with poetry
+    # TODO Make this an Action
     - name: Install Dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install pylint flake8 bandit
+        pip install pylint flake8 bandit pytest
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-    - name: Run tests
+    - name: Run Tests
       run: pytest
 
     # TODO Make the config files optional
@@ -42,8 +39,3 @@ jobs:
         flake8
         echo "\n${BLUE}Running Bandit against source files...${NC}\n"
         bandit -r --ini setup.cfg
-
-    - name: Test input variable
-      run: echo "Hello"
-#      with:
-#        username: ${{ inputs.username }}
