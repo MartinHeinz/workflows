@@ -1,5 +1,13 @@
 name: Python CI job
 
+# Inputs:
+# - Python versions, (Opt., Default ['3.10'])
+# - Dependency manager (PIP/Poetry)
+# - Acceptance tests (Boolean)
+# - Slack webhook (Opt., Secret)
+# - Whether to enforce quality gates, coverage, vulnerabilities, code style...
+# - CC, Sonar tokens (Secret)
+# - Push destination (Opt., Default to current repo registry)
 on:
   workflow_call:
     # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#onworkflow_callinputs
@@ -18,7 +26,7 @@ jobs:
         python-version: ${{ matrix.python }}
 
     # TODO Make this work with poetry
-    # TODO Make this an Action
+    # TODO Conditionally decide whether to use PIP or Poetry - https://docs.github.com/en/actions/learn-github-actions/expressions
     - name: Install Dependencies
       run: |
         python -m pip install --upgrade pip
@@ -40,26 +48,52 @@ jobs:
         echo "\n${BLUE}Running Bandit against source files...${NC}\n"
         bandit -r --ini setup.cfg
 
+    # https://black.readthedocs.io/en/stable/integrations/github_actions.html
+    - name: Verify code style (Black)
+      run: echo "Black"
+
+    # https://github.com/marketplace/actions/flake8-action
+    # https://github.com/marketplace/actions/python-flake8
+    - name: Enforce code style (Flake8)
+      run: echo "Flake8"
+
+    # https://github.com/cclauss/GitHub-Action-for-pylint
+    - name: Lint code
+      run: echo "Pylint"
+
+    # https://github.com/marketplace/actions/python-security-check-using-bandit
+    - name: Code security check
+      run: echo "Bandit"
+
+    # Sonar - https://github.com/marketplace/actions/sonarqube-scan
+    # CC - https://github.com/paambaati/codeclimate-action
+    #    - https://github.com/MartinHeinz/python-container-utils/blob/master/.github/workflows/build-test.yml#L32
     - name: Check code quality
       run: echo "Sonar and/or CodeClimate"
 
+    # https://github.com/redhat-actions/buildah-build
     - name: Build container image
       run: echo "Build image"
 
+    # https://github.com/marketplace/actions/newman-action
     - name: Run acceptance tests
       run: echo "Newman"
 
     - name: Analyze image efficiency
       run: echo "Dive"
 
+    # https://github.com/aquasecurity/trivy-action
     - name: Trivy vulnerability scan
       run: echo "Trivy"
 
+    # https://github.com/sigstore/cosign-installer
     - name: Sign image with Cosign
       run: echo "Cosign"
 
+    # https://github.com/redhat-actions/push-to-registry
     - name: Push container image
       run: echo "Push image"
 
+    # https://github.com/marketplace/actions/slack-notify
     - name: Notify
       run: echo "Notify on Slack/Email"
