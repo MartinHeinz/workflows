@@ -39,3 +39,27 @@ jobs:
         flake8
         echo "\n${BLUE}Running Bandit against source files...${NC}\n"
         bandit -r --ini setup.cfg
+
+    - name: Check code quality
+      run: echo "Sonar and/or CodeClimate"
+
+    - name: Build container image
+      run: echo "Build image"
+
+    - name: Run acceptance tests
+      run: echo "Newman"
+
+    - name: Analyze image efficiency
+      run: echo "Dive"
+
+    - name: Trivy vulnerability scan
+      run: echo "Trivy"
+
+    - name: Sign image with Cosign
+      run: echo "Cosign"
+
+    - name: Push container image
+      run: echo "Push image"
+
+    - name: Notify
+      run: echo "Notify on Slack/Email"
