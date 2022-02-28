@@ -61,6 +61,7 @@ jobs:
     - name: Code security check
       run: bandit -r --ini setup.cfg
 
+    # Run if SONAR_TOKEN (and properties file) is provided
     - name: SonarCloud scanner
       uses: sonarsource/sonarcloud-github-action@master
       env:
