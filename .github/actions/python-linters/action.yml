@@ -1,0 +1,19 @@
+# https://docs.github.com/en/actions/creating-actions/creating-a-docker-container-action
+# https://docs.github.com/en/actions/creating-actions/metadata-syntax-for-github-actions
+name: 'Dive'
+description: 'Runs Dive'
+
+# Sample/Dummy task template
+inputs:
+  who-to-greet:  # id of input
+    description: 'Who to greet'
+    required: true
+    default: 'World'
+outputs:
+  time: # id of output
+    description: 'The time we greeted you'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - ${{ inputs.who-to-greet }}
