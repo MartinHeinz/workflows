@@ -97,6 +97,7 @@ jobs:
           COMMIT_MESSAGE=${{ github.event.head_commit.message }}
 
     # TODO Run conditionally
+    # TODO add sample collection to tester repo
     - name: Run acceptance tests
       uses: matt-ball/newman-action@master
       with:
@@ -104,6 +105,7 @@ jobs:
         environment: acceptance/environment.json
 
     # TODO - https://github.com/wagoodman/dive
+    # Create Task
     - name: Analyze image efficiency
       run: echo "Dive"
 
