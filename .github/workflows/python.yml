@@ -16,6 +16,12 @@ on:
 jobs:
   python-ci:
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+      id-token: write  # Cosign - signing the images with GitHub OIDC Token
+
     steps:
     - uses: actions/checkout@v1
 
