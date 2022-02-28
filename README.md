@@ -18,6 +18,20 @@
 - Click _Repo Settings_ (top left)
 - Go to _Test Coverage_ tab under _Analysis_ and copy _Test reporter ID_
 
+## Configure Slack Notification
+
+Create Slack App:
+- Navigate to <https://api.slack.com/apps/>, Click _Create an App_, Give it name, choose workspace
+- Click _Incoming Webhook_, Switch on with slider
+- Click _Add New Webhook to Workspace_
+- Choose Channel, Click _Allow_, Copy _Webhook URL_
+
+- In repository, navigate to Settings -> Secrets -> Actions
+    - `https://github.com/MartinHeinz/<REPO_NAME>/settings/secrets/actions`
+- Click _New Repository Secret_:
+    - Name: `SLACK_WEBHOOK`
+    - Value: _Webhook URL_
+
 -----
 
 - In repository, navigate to Settings -> Secrets -> Actions
