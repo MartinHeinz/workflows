@@ -12,18 +12,24 @@ on:
   workflow_call:
     # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#onworkflow_callinputs
 
+# TODO Inputs
 jobs:
   python-ci:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python: [ '3.9', '3.10' ]
+        python: [ '3.10' ]  # TODO what to do during push with multiple versions?
     steps:
     - uses: actions/checkout@v1
 
     - uses: actions/setup-python@v1
       with:
         python-version: ${{ matrix.python }}
+
+    - name: Install cosign
+      uses: sigstore/cosign-installer@main
+      with:
+        cosign-release: 'v2.0.1'
 
     # TODO Make this work with poetry
     # TODO Conditionally decide whether to use PIP or Poetry - https://docs.github.com/en/actions/learn-github-actions/expressions
@@ -33,67 +39,106 @@ jobs:
         pip install pylint flake8 bandit pytest
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
+      # TODO add option for config file
     - name: Run Tests
       run: pytest
 
-    # TODO Make the config files optional
-    - name: Run Linters
-      run: |
-        BLUE='\033[0;34m'
-        NC='\033[0m'
-        echo "\n${BLUE}Running Pylint against source and test files...${NC}\n"
-        pylint --rcfile=setup.cfg **/*.py
-        echo "\n${BLUE}Running Flake8 against source and test files...${NC}\n"
-        flake8
-        echo "\n${BLUE}Running Bandit against source files...${NC}\n"
-        bandit -r --ini setup.cfg
-
     # https://black.readthedocs.io/en/stable/integrations/github_actions.html
     - name: Verify code style (Black)
-      run: echo "Black"
+      uses: psf/black@stable
+      with:
+        # TODO run `check` only if code style is enforced
+        options: "--check --verbose"
 
-    # https://github.com/marketplace/actions/flake8-action
-    # https://github.com/marketplace/actions/python-flake8
     - name: Enforce code style (Flake8)
-      run: echo "Flake8"
+      run: flake8
 
-    # https://github.com/cclauss/GitHub-Action-for-pylint
+    # TODO Make config file optional
     - name: Lint code
-      run: echo "Pylint"
+      run: pylint --rcfile=setup.cfg **/*.py
 
-    # https://github.com/marketplace/actions/python-security-check-using-bandit
+    # TODO Make config file optional
     - name: Code security check
-      run: echo "Bandit"
+      run: bandit -r --ini setup.cfg
 
-    # Sonar - https://github.com/marketplace/actions/sonarqube-scan
-    # CC - https://github.com/paambaati/codeclimate-action
-    #    - https://github.com/MartinHeinz/python-container-utils/blob/master/.github/workflows/build-test.yml#L32
-    - name: Check code quality
-      run: echo "Sonar and/or CodeClimate"
+    - name: SonarCloud scanner
+      uses: sonarsource/sonarcloud-github-action@master
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-    # https://github.com/redhat-actions/buildah-build
+    # TODO Run if CC_TEST_REPORTER_ID is provided
+    - name: Send report to CodeClimate
+      uses: paambaati/codeclimate-action@v3.0.0
+      env:
+        CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
+      with:
+        coverageCommand: make ci
+        prefix: github.com/MartinHeinz/go-github-app
+        coverageLocations: |
+          ${{github.workspace}}/.coverage:coverage.py
+
+    - id: get-tag
+      run: |
+        tag=$(echo ${{github.sha}} | cut -c -7)
+        echo "::set-output name=tag::$tag"
+
     - name: Build container image
-      run: echo "Build image"
+      uses: redhat-actions/buildah-build@v2
+      with:
+        image: ghcr.io/${{ github.repository }}
+        tags: latest "${{ steps.get-tag.outputs.tag }}"
+        containerfiles: |
+          ./Dockerfile
+        labels: |
+          COMMIT=${{ github.event.head_commit.id }}
+          COMMIT_MESSAGE=${{ github.event.head_commit.message }}
 
-    # https://github.com/marketplace/actions/newman-action
+    # TODO Run conditionally
     - name: Run acceptance tests
-      run: echo "Newman"
+      uses: matt-ball/newman-action@master
+      with:
+        collection: acceptance/collection.json
+        environment: acceptance/environment.json
 
+    # TODO - https://github.com/wagoodman/dive
     - name: Analyze image efficiency
       run: echo "Dive"
 
-    # https://github.com/aquasecurity/trivy-action
     - name: Trivy vulnerability scan
-      run: echo "Trivy"
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: 'ghcr.io/${{ github.repository }}:latest'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
 
-    # https://github.com/sigstore/cosign-installer
-    - name: Sign image with Cosign
-      run: echo "Cosign"
-
-    # https://github.com/redhat-actions/push-to-registry
     - name: Push container image
-      run: echo "Push image"
+      id: push
+      uses: redhat-actions/push-to-registry@v2
+      with:
+        tags: ghcr.io/${{ github.repository }}:latest ghcr.io/${{ github.repository }}:${{ steps.get-tag.outputs.tag }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
 
-    # https://github.com/marketplace/actions/slack-notify
-    - name: Notify
-      run: echo "Notify on Slack/Email"
+    # https://github.com/actions/starter-workflows/blob/main/ci/docker-publish.yml
+    - name: Sign the published Docker image
+      env:
+        COSIGN_EXPERIMENTAL: "true"
+      run: cosign sign ghcr.io/${{ github.repository }}@${{ steps.push.outputs.digest }}
+
+    - name: Upload Trivy scan results to GitHub Security tab
+      uses: github/codeql-action/upload-sarif@v1
+      with:
+        sarif_file: 'trivy-results.sarif'
+
+    - name: Slack notification
+      uses: rtCamp/action-slack-notify@v2
+      if: always()
+      env:
+        SLACK_CHANNEL: general
+        SLACK_COLOR: ${{ job.status }}
+        SLACK_ICON: https://github.com/${{ github.actor }}.png?size=48
+        SLACK_MESSAGE: 'Post Content :rocket:'
+        SLACK_TITLE: Successful build  # TODO Make this conditional
+        SLACK_USERNAME: ${{ github.actor }}
+        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
