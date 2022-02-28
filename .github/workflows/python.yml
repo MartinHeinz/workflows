@@ -31,8 +31,6 @@ jobs:
 
     - name: Install cosign
       uses: sigstore/cosign-installer@main
-      with:
-        cosign-release: 'v2.0.1'
 
     # TODO Make this work with poetry
     # TODO Conditionally decide whether to use PIP or Poetry - https://docs.github.com/en/actions/learn-github-actions/expressions
