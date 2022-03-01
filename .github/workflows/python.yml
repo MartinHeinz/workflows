@@ -158,6 +158,7 @@ jobs:
       with:
         context: .
         push: true
+        tags: ${{ steps.meta.outputs.tags }}
 
     # https://github.com/actions/starter-workflows/blob/main/ci/docker-publish.yml
     - name: Sign the published Docker image
