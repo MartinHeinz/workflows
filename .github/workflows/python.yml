@@ -11,6 +11,16 @@ name: Python CI job
 on:
   workflow_call:
     # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#onworkflow_callinputs
+    secrets:
+      SONAR_TOKEN:
+        description: 'SonarCloud project token'
+        required: false
+      CC_TEST_REPORTER_ID:
+        description: 'CodeClimate Test Reported ID'
+        required: false
+      SLACK_WEBHOOK:
+        description: 'Slack webhook URL'
+        required: false
 
 # TODO Inputs
 jobs:
