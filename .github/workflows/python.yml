@@ -35,7 +35,6 @@ on:
         description: 'Slack webhook URL'
         required: false
 
-# TODO Inputs
 jobs:
   python-ci:
     runs-on: ubuntu-latest
@@ -85,7 +84,6 @@ jobs:
     - name: Code security check
       run: bandit -r --ini setup.cfg
 
-    # TODO Run if CC_TEST_REPORTER_ID is provided
     - name: Send report to CodeClimate
       uses: paambaati/codeclimate-action@v3.0.0
       if: ${{ inputs.ENABLE_CODE_CLIMATE }}
@@ -95,7 +93,7 @@ jobs:
         coverageLocations: |
           ${{github.workspace}}/coverage.xml:coverage.py
 
-    # TODO Run if SONAR_TOKEN (and properties file) is provided
+    # TODO Run if and properties file is provided
     - name: SonarCloud scanner
       uses: sonarsource/sonarcloud-github-action@master
       if: ${{ inputs.ENABLE_SONAR }}
@@ -130,6 +128,13 @@ jobs:
     # Create Task
     - name: Analyze image efficiency
       run: echo "Dive"
+
+    - name: Initialize Podman
+      uses: redhat-actions/podman-login@v1
+      with:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+        registry: ghcr.io/${{ steps.get-repo.outputs.repo }}
 
     - name: Trivy vulnerability scan
       uses: aquasecurity/trivy-action@master
