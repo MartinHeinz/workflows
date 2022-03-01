@@ -127,9 +127,8 @@ jobs:
         # list of Docker images to use as base name for tags
         images: |
            ghcr.io/${{ steps.get-repo.outputs.repo }}
-        # generate Docker tags based on the following events/attributes
+        # TODO Test with `git push tag`
         tags: |
-          # Test with `git push tag`
           type=ref,event=tag
           type=sha
         labels: |
