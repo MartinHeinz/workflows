@@ -81,12 +81,18 @@ jobs:
         coverageLocations: |
           ${{github.workspace}}/coverage.xml:coverage.py
 
-    # Run if SONAR_TOKEN (and properties file) is provided
+    # TODO Run if SONAR_TOKEN (and properties file) is provided
     - name: SonarCloud scanner
       uses: sonarsource/sonarcloud-github-action@master
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+    - name: Get repository for image
+      id: get-repo
+      run: |
+        repo=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')
+        echo "::set-output name=repo::$repo"
 
     - name: Get tag for image
       id: get-tag
@@ -97,21 +103,13 @@ jobs:
     - name: Build container image
       uses: redhat-actions/buildah-build@v2
       with:
-        image: ghcr.io/${{ github.repository }}
+        image: ghcr.io/${{ steps.get-repo.outputs.repo }}
         tags: latest "${{ steps.get-tag.outputs.tag }}"
         containerfiles: |
           ./Dockerfile
         labels: |
           COMMIT=${{ github.event.head_commit.id }}
           COMMIT_MESSAGE=${{ github.event.head_commit.message }}
-
-    # TODO Run conditionally
-    # TODO add sample collection to tester repo
-    - name: Run acceptance tests
-      uses: matt-ball/newman-action@master
-      with:
-        collection: acceptance/collection.json
-        environment: acceptance/environment.json
 
     # TODO - https://github.com/wagoodman/dive
     # Create Task
@@ -121,7 +119,7 @@ jobs:
     - name: Trivy vulnerability scan
       uses: aquasecurity/trivy-action@master
       with:
-        image-ref: 'ghcr.io/${{ github.repository }}:latest'
+        image-ref: 'ghcr.io/${{ steps.get-repo.outputs.repo }}:latest'
         format: 'sarif'
         output: 'trivy-results.sarif'
 
@@ -129,7 +127,7 @@ jobs:
       id: push
       uses: redhat-actions/push-to-registry@v2
       with:
-        tags: ghcr.io/${{ github.repository }}:latest ghcr.io/${{ github.repository }}:${{ steps.get-tag.outputs.tag }}
+        tags: ghcr.io/${{ steps.get-repo.outputs.repo }}:latest ghcr.io/${{ steps.get-repo.outputs.repo }}:${{ steps.get-tag.outputs.tag }}
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
@@ -137,7 +135,7 @@ jobs:
     - name: Sign the published Docker image
       env:
         COSIGN_EXPERIMENTAL: "true"
-      run: cosign sign ghcr.io/${{ github.repository }}@${{ steps.push.outputs.digest }}
+      run: cosign sign ghcr.io/${{ steps.get-repo.outputs.repo }}@${{ steps.push.outputs.digest }}
 
     - name: Upload Trivy scan results to GitHub Security tab
       uses: github/codeql-action/upload-sarif@v1
