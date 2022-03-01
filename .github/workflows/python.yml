@@ -110,12 +110,6 @@ jobs:
         repo=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')
         echo "::set-output name=repo::$repo"
 
-    - name: Get tag for image
-      id: get-tag
-      run: |
-        tag=$(echo ${{github.sha}} | cut -c -7)
-        echo "::set-output name=tag::$tag"
-
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v1
 
@@ -126,15 +120,29 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
+    - name: Generate tags and image meta
+      id: meta
+      uses: docker/metadata-action@v3
+      with:
+        # list of Docker images to use as base name for tags
+        images: |
+           ghcr.io/${{ steps.get-repo.outputs.repo }}
+        # generate Docker tags based on the following events/attributes
+        tags: |
+          # Test with `git push tag`
+          type=ref,event=tag
+          type=sha
+        labels: |
+          COMMIT=${{ github.event.head_commit.id }}
+          COMMIT_MESSAGE=${{ github.event.head_commit.message }}
+
     - name: Build image
       uses: docker/build-push-action@v2
       with:
         context: .
         load: true
-        tags:  ghcr.io/${{ steps.get-repo.outputs.repo }}:latest  ghcr.io/${{ steps.get-repo.outputs.repo }}:${{ steps.get-tag.outputs.tag }}
-        labels: |
-          COMMIT=${{ github.event.head_commit.id }}
-          COMMIT_MESSAGE=${{ github.event.head_commit.message }}
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
 
     # TODO - https://github.com/wagoodman/dive
     # Create Task
