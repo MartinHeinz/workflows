@@ -11,6 +11,19 @@ name: Python CI job
 on:
   workflow_call:
     # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#onworkflow_callinputs
+    inputs:
+      ENABLE_SONAR:
+        required: false
+        type: boolean
+        default: false
+      ENABLE_CODE_CLIMATE:
+        required: false
+        type: boolean
+        default: false
+      ENABLE_SLACK:
+        required: false
+        type: boolean
+        default: false
     secrets:
       SONAR_TOKEN:
         description: 'SonarCloud project token'
@@ -75,7 +88,7 @@ jobs:
     # TODO Run if CC_TEST_REPORTER_ID is provided
     - name: Send report to CodeClimate
       uses: paambaati/codeclimate-action@v3.0.0
-      if: ${{ secrets.CC_TEST_REPORTER_ID != 0 }}
+      if: ${{ inputs.ENABLE_CODE_CLIMATE }}
       env:
         CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
       with:
@@ -85,7 +98,7 @@ jobs:
     # TODO Run if SONAR_TOKEN (and properties file) is provided
     - name: SonarCloud scanner
       uses: sonarsource/sonarcloud-github-action@master
-      if: ${{ secrets.SONAR_TOKEN != 0 }}
+      if: ${{ inputs.ENABLE_SONAR }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -146,7 +159,7 @@ jobs:
 
     - name: Slack notification
       uses: rtCamp/action-slack-notify@v2
-      if: always()
+      if: ${{ inputs.ENABLE_SLACK }}
       env:
         SLACK_CHANNEL: general
         SLACK_COLOR: ${{ job.status }}
