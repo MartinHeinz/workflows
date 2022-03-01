@@ -12,6 +12,8 @@
     - Name: `SONAR_TOKEN`
     - Value: _SonarCloud Token_
 
+- In `https://sonarcloud.io/project/analysis_method?id=<PROJECT_KEY>` disable the _SonarCloud Automatic Analysis_
+
 ## Configure CodeClimate
 
 - Navigate to <https://codeclimate.com/github/repos/new> and add repository

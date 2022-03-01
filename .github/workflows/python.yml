@@ -72,23 +72,21 @@ jobs:
     - name: Code security check
       run: bandit -r --ini setup.cfg
 
-    # Run if SONAR_TOKEN (and properties file) is provided
-    - name: SonarCloud scanner
-      uses: sonarsource/sonarcloud-github-action@master
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
     # TODO Run if CC_TEST_REPORTER_ID is provided
     - name: Send report to CodeClimate
       uses: paambaati/codeclimate-action@v3.0.0
       env:
         CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
       with:
-        coverageCommand: make ci
-        prefix: github.com/MartinHeinz/go-github-app
         coverageLocations: |
           ${{github.workspace}}/.coverage:coverage.py
+
+    # Run if SONAR_TOKEN (and properties file) is provided
+    - name: SonarCloud scanner
+      uses: sonarsource/sonarcloud-github-action@master
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
     - id: get-tag
       run: |
