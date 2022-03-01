@@ -79,7 +79,7 @@ jobs:
         CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
       with:
         coverageLocations: |
-          ${{github.workspace}}/.coverage:coverage.py
+          ${{github.workspace}}/coverage.xml:coverage.py
 
     # Run if SONAR_TOKEN (and properties file) is provided
     - name: SonarCloud scanner
@@ -88,7 +88,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-    - id: get-tag
+    - name: Get tag for image
+      id: get-tag
       run: |
         tag=$(echo ${{github.sha}} | cut -c -7)
         echo "::set-output name=tag::$tag"
