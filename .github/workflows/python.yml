@@ -131,9 +131,6 @@ jobs:
         tags: |
           type=ref,event=tag
           type=sha
-        labels: |
-          COMMIT=${{ github.event.head_commit.id }}
-          COMMIT_MESSAGE=${{ github.event.head_commit.message }}
 
     - name: Build image
       uses: docker/build-push-action@v2
@@ -151,7 +148,7 @@ jobs:
     - name: Trivy vulnerability scan
       uses: aquasecurity/trivy-action@master
       with:
-        image-ref: 'ghcr.io/${{ steps.get-repo.outputs.repo }}:latest'
+        image-ref: 'ghcr.io/${{ steps.get-repo.outputs.repo }}:${{ steps.meta.outputs.version }}'
         format: 'sarif'
         output: 'trivy-results.sarif'
 
@@ -161,7 +158,6 @@ jobs:
       with:
         context: .
         push: true
-        tags:  ghcr.io/${{ steps.get-repo.outputs.repo }}:latest  ghcr.io/${{ steps.get-repo.outputs.repo }}:${{ steps.get-tag.outputs.tag }}
 
     # https://github.com/actions/starter-workflows/blob/main/ci/docker-publish.yml
     - name: Sign the published Docker image
