@@ -104,8 +104,8 @@ jobs:
           pipenv install
         fi
 
-      # TODO add option for config file
     - name: Run Tests
+      # Will find config automatically in `pytest.ini`, `pyproject.toml`, `tox.ini` or `setup.cfg` - https://docs.pytest.org/en/6.2.x/customize.html#configuration-file-formats
       run: |
         source venv/bin/activate
         pytest
