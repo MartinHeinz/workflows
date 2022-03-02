@@ -98,7 +98,9 @@ jobs:
 
       # TODO add option for config file
     - name: Run Tests
-      run: pytest
+      run: |
+        source .venv/bin/deactivate || true  # Run with global pytest, installed by pip
+        pytest
 
     - name: Verify code style (Black)
       uses: psf/black@stable
