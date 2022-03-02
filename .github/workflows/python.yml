@@ -80,12 +80,19 @@ jobs:
       uses: sigstore/cosign-installer@main
 
     # TODO Make this work with poetry
-    # TODO Conditionally decide whether to use PIP or Poetry
     - name: Install Dependencies
       run: |
         python -m pip install --upgrade pip
         pip install pylint flake8 bandit pytest
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        if [ -f requirements.txt ]; then
+          pip install -r requirements.txt;
+        elif [ -f poetry.lock ]; then
+          curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
+          poetry install
+        elif [-f Pipfile.lock ]; then
+          pip install pipenv
+          pipenv install
+        fi
 
       # TODO add option for config file
     - name: Run Tests
@@ -203,7 +210,26 @@ jobs:
       with:
         sarif_file: 'trivy-results.sarif'
 
-    # TODO Customize params; Make it run Always + If Enabled
+    - name: Prepare content for Slack notification
+      if: ${{ inputs.ENABLE_SLACK }}
+      id: gen-slack-messages
+      run: |
+        MESSAGE=""
+        TITLE=""
+        if [ "${{ job.status }}" = "success" ]; then
+          MESSAGE="Job was successful"
+          TITLE="Job Success"
+        elif [ "${{ job.failure }}" = "success" ]; then
+          MESSAGE="Job failed"
+          TITLE="Job Failed"
+        else
+          MESSAGE="Job was cancelled"
+          TITLE="Job Cancelled"
+        fi
+        echo "::set-output name=message::$MESSAGE"
+        echo "::set-output name=title::$TITLE"
+
+    # TODO Make it run Always + If Enabled
     - name: Slack notification
       uses: rtCamp/action-slack-notify@v2
       if: ${{ inputs.ENABLE_SLACK }}
@@ -211,7 +237,7 @@ jobs:
         SLACK_CHANNEL: general
         SLACK_COLOR: ${{ job.status }}
         SLACK_ICON: https://github.com/${{ github.actor }}.png?size=48
-        SLACK_MESSAGE: 'Post Content :rocket:'
-        SLACK_TITLE: Successful build
+        SLACK_MESSAGE: ${{ steps.gen-slack-messages.outputs.message }}
+        SLACK_TITLE: ${{ steps.gen-slack-messages.outputs.title }}
         SLACK_USERNAME: ${{ github.actor }}
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
