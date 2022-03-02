@@ -25,6 +25,22 @@ on:
         required: false
         type: boolean
         default: false
+      ENFORCE_PYLINT:
+        required: false
+        type: boolean
+        default: true
+      ENFORCE_BLACK:
+        required: false
+        type: boolean
+        default: true
+      ENFORCE_FLAKE8:
+        required: false
+        type: boolean
+        default: true
+      ENFORCE_BANDIT:
+        required: false
+        type: boolean
+        default: true
     secrets:
       SONAR_TOKEN:
         description: 'SonarCloud project token'
@@ -68,26 +84,21 @@ jobs:
     - name: Run Tests
       run: pytest
 
-    # TODO Add option to disable enforcement
-
     - name: Verify code style (Black)
       uses: psf/black@stable
       with:
-        options: "--check --verbose"
+        options: "--verbose ${{ inputs.ENFORCE_BLACK && '--check' || '' }}"
 
-    # TODO Add option to disable enforcement
     - name: Enforce code style (Flake8)
-      run: flake8
+      run: flake8 ${{ inputs.ENFORCE_FLAKE8 && '' || '--exit-zero' }}
 
     # TODO Make config file optional
-    # TODO Add option to disable enforcement
     - name: Lint code
-      run: pylint --rcfile=setup.cfg **/*.py
+      run: pylint --rcfile=setup.cfg **/*.py  ${{ inputs.ENFORCE_PYLINT && '' || '--exit-zero' }}
 
     # TODO Make config file optional
-    # TODO Add option to disable enforcement
     - name: Code security check
-      run: bandit -r --ini setup.cfg
+      run: bandit -r --ini setup.cfg ${{ inputs.ENFORCE_BANDIT && '' || '--exit-zero' }}
 
     - name: Send report to CodeClimate
       uses: paambaati/codeclimate-action@v3.0.0
