@@ -114,11 +114,14 @@ jobs:
 
     - name: Enforce code style (Flake8)
       # Will find config automatically in `setup.cfg`, `tox.ini`, or `.flake8` - https://flake8.pycqa.org/en/latest/user/configuration.html#configuration-locations
-      run: flake8 ${{ inputs.ENFORCE_FLAKE8 && '' || '--exit-zero' }}
+      run: |
+        source venv/bin/activate
+        flake8 ${{ inputs.ENFORCE_FLAKE8 && '' || '--exit-zero' }}
 
     - name: Lint code
       # Will find config automatically in `pylintrc`, `.pylintrc`, `pyproject.toml`, NOT `setup.cfg` - https://pylint.pycqa.org/en/latest/user_guide/run.html#command-line-options
       run: |
+        source venv/bin/activate
         PYLINT_CONDITIONAL_ARGS=()
         if [ -n "${{ inputs.PYLINT_CONFIG }}" ]; then
           PYLINT_CONDITIONAL_ARGS+=( --rcfile=${{ inputs.PYLINT_CONFIG }} )
@@ -129,6 +132,7 @@ jobs:
     - name: Code security check
       # Will find config automatically in `.bandit`, others have to specified with --ini - see https://github.com/PyCQA/bandit/issues/396#issuecomment-475152672
       run: |
+        source venv/bin/activate
         BANDIT_CONDITIONAL_ARGS=()
         if [ -n "${{ inputs.BANDIT_CONFIG }}" ]; then
           BANDIT_CONDITIONAL_ARGS+=( --ini ${{ inputs.BANDIT_CONFIG }} )
