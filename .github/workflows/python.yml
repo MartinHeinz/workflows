@@ -102,11 +102,11 @@ jobs:
 
     - name: Lint code
       # Will find config automatically in `pylintrc`, `.pylintrc`, `pyproject.toml`, NOT `setup.cfg` - https://pylint.pycqa.org/en/latest/user_guide/run.html#command-line-options
-      run: pylint **/*.py  ${{ inputs.PYLINT_CONFIG == '' && '' || --rcfile=inputs.PYLINT_CONFIG }} ${{ inputs.ENFORCE_PYLINT && '' || '--exit-zero' }}
+      run: pylint **/*.py  ${{ inputs.PYLINT_CONFIG == '' && '' || "--rcfile=inputs.PYLINT_CONFIG" }} ${{ inputs.ENFORCE_PYLINT && '' || '--exit-zero' }}
 
     - name: Code security check
       # Will find config automatically in `.bandit`, others have to specified with --ini - see https://github.com/PyCQA/bandit/issues/396#issuecomment-475152672
-      run: bandit -r ${{ inputs.BANDIT_CONFIG == '' && '.' || --ini inputs.BANDIT_CONFIG }} ${{ inputs.ENFORCE_BANDIT && '' || '--exit-zero' }}
+      run: bandit -r ${{ inputs.BANDIT_CONFIG == '' && '.' || "--ini inputs.BANDIT_CONFIG" }} ${{ inputs.ENFORCE_BANDIT && '' || '--exit-zero' }}
 
     - name: Send report to CodeClimate
       uses: paambaati/codeclimate-action@v3.0.0
