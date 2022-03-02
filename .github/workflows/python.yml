@@ -87,7 +87,7 @@ jobs:
     - name: Install cosign
       uses: sigstore/cosign-installer@main
 
-    # TODO Make this work with pipenv
+    # TODO Install pytest-cov globally
     # TODO caching, based on https://github.com/snok/install-poetry#virtualenv-variations
     - name: Install Dependencies
       run: |
@@ -99,7 +99,7 @@ jobs:
           pip install -r requirements.txt;
         elif [ -f poetry.lock ]; then
           poetry install
-        elif [-f Pipfile.lock ]; then
+        elif [ -f Pipfile.lock ]; then
           pip install pipenv
           pipenv install
         fi
@@ -226,6 +226,7 @@ jobs:
       with:
         sarif_file: 'trivy-results.sarif'
 
+    # TODO Make it run Always + If Enabled
     - name: Prepare content for Slack notification
       if: ${{ inputs.ENABLE_SLACK }}
       id: gen-slack-messages
