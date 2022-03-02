@@ -87,7 +87,7 @@ jobs:
     - name: Install cosign
       uses: sigstore/cosign-installer@main
 
-    # TODO Install pytest-cov globally
+    # TODO Install pytest-cov globally, Test with CodeClimate
     # TODO caching, based on https://github.com/snok/install-poetry#virtualenv-variations
     - name: Install Dependencies
       run: |
