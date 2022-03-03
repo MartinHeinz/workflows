@@ -11,7 +11,7 @@ on:
         required: false
         type: string
         default: '3.10'
-      DEPENDENCY_MANAGER:
+      DEPENDENCY_MANAGER:  # TODO Make this into list option
         required: false
         type: string
         default: 'pip'  # or poetry, pipenv
