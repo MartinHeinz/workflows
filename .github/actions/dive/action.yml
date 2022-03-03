@@ -11,6 +11,7 @@ inputs:
     description: "Path to dive config file"
     required: false
     default: ${{ github.workspace }}/.dive-ci
+# TODO Outputs
 #outputs:
 #  efficiency:
 #    description: 'Efficiency of the image'
