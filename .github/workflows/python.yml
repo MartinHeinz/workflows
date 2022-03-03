@@ -251,8 +251,8 @@ jobs:
         context: .
         push: true
         tags: ${{ steps.meta.outputs.tags }}
-        cache-from: type=registry,ref=${{ steps.get-repo.outputs.repo }}:latest
-        cache-to: type=registry,ref=${{ steps.get-repo.outputs.repo }}:latest,mode=max
+        cache-from: type=registry,ref=ghcr.io/${{ steps.get-repo.outputs.repo }}:latest
+        cache-to: type=registry,ref=ghcr.io/${{ steps.get-repo.outputs.repo }}:latest,mode=max
 
     - name: Sign the published Docker image
       env:
@@ -286,7 +286,7 @@ jobs:
         SLACK_CHANNEL: general
         SLACK_COLOR: ${{ job.status }}
         SLACK_ICON: https://github.com/${{ github.actor }}.png?size=48
-        SLACK_MESSAGE: ${{ github.head_commit.message }}
+        SLACK_MESSAGE: ${{ github.event.head_commit.message }}
         SLACK_TITLE: ${{ steps.gen-slack-messages.outputs.title }}
         SLACK_USERNAME: ${{ github.actor }}
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
