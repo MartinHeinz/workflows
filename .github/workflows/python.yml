@@ -79,6 +79,7 @@ jobs:
     - uses: actions/checkout@v1
 
     - uses: actions/setup-python@v1
+      id: setup-python
       with:
         python-version: ${{ inputs.PYTHON_VERSION }}
 
@@ -96,13 +97,13 @@ jobs:
         CACHE_PATH=""
 
         if [ inputs.DEPENDENCY_MANAGER = 'pip' ]; then
-          CACHE_KEY="venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/requirements.txt') }}
+          CACHE_KEY="venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/requirements.txt') }}"
           CACHE_PATH=$(pip cache dir)
         elif [ inputs.DEPENDENCY_MANAGER = 'poetry' ]; then
           CACHE_KEY="venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}"
           CACHE_PATH=$(poetry config cache-dir)
         elif [ inputs.DEPENDENCY_MANAGER = 'pipenv' ]; then
-          CACHE_KEY="venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/Pipfile.lock') }}
+          CACHE_KEY="venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/Pipfile.lock') }}"
           CACHE_PATH="./venv"
         fi
         echo "::set-output name=cache-key::$CACHE_KEY"
