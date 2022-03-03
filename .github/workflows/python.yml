@@ -96,13 +96,13 @@ jobs:
         CACHE_KEY=""
         CACHE_PATH=""
 
-        if [ inputs.DEPENDENCY_MANAGER = 'pip' ]; then
+        if [ ${{ inputs.DEPENDENCY_MANAGER }} = 'pip' ]; then
           CACHE_KEY="venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/requirements.txt') }}"
           CACHE_PATH=$(pip cache dir)
-        elif [ inputs.DEPENDENCY_MANAGER = 'poetry' ]; then
+        elif [ ${{ inputs.DEPENDENCY_MANAGER }} = 'poetry' ]; then
           CACHE_KEY="venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}"
           CACHE_PATH=$(poetry config cache-dir)
-        elif [ inputs.DEPENDENCY_MANAGER = 'pipenv' ]; then
+        elif [ ${{ inputs.DEPENDENCY_MANAGER }} = 'pipenv' ]; then
           CACHE_KEY="venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/Pipfile.lock') }}"
           CACHE_PATH="./venv"
         fi
