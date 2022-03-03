@@ -1,0 +1,23 @@
+# https://docs.github.com/en/actions/creating-actions/creating-a-docker-container-action
+# https://docs.github.com/en/actions/creating-actions/metadata-syntax-for-github-actions
+name: 'Dive'
+description: "Run Dive to analyze the container image efficiency"
+
+inputs:
+  image:
+    description: "Image to analyze"
+    required: true
+  config:
+    description: "Path to dive config file"
+    required: false
+    default: ${{ github.workspace }}/.dive-ci
+#outputs:
+#  efficiency:
+#    description: 'Efficiency of the image'
+#  wasted-bytes:
+#    description: 'Number of wasted bytes'
+#  user-wasted-percent:
+#    description: ''
+runs:
+  using: 'node16'
+  main: 'index.js'
