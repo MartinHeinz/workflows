@@ -234,8 +234,7 @@ jobs:
 
     # https://github.com/docker/build-push-action/blob/master/docs/advanced/local-registry.md
     - name: Analyze image efficiency
-      # TODO Move to separate repository
-      uses: ./actions/dive
+      uses: MartinHeinz/dive-action@v0.0.1
       with:
         image: 'ghcr.io/${{ steps.get-repo.outputs.repo }}:${{ steps.meta.outputs.version }}'
 
