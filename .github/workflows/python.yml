@@ -286,7 +286,6 @@ jobs:
         SLACK_CHANNEL: general
         SLACK_COLOR: ${{ job.status }}
         SLACK_ICON: https://github.com/${{ github.actor }}.png?size=48
-        SLACK_MESSAGE: ${{ github.event.head_commit.message }}
         SLACK_TITLE: ${{ steps.gen-slack-messages.outputs.title }}
         SLACK_USERNAME: ${{ github.actor }}
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
