@@ -234,7 +234,7 @@ jobs:
 
     # https://github.com/docker/build-push-action/blob/master/docs/advanced/local-registry.md
     - name: Analyze image efficiency
-      uses: ./.github/workflows/actions/dive
+      uses: ./.github/actions/dive
       with:
         image: 'ghcr.io/${{ steps.get-repo.outputs.repo }}:${{ steps.meta.outputs.version }}'
 
