@@ -99,7 +99,6 @@ jobs:
           CACHE_KEY="venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/requirements.txt') }}"
           CACHE_PATH=$(pip cache dir)
         elif [ ${{ inputs.DEPENDENCY_MANAGER }} = 'poetry' ]; then
-          # TODO Does this work?
           CACHE_KEY="venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}"
           CACHE_PATH=$(poetry config cache-dir)
         elif [ ${{ inputs.DEPENDENCY_MANAGER }} = 'pipenv' ]; then
@@ -109,7 +108,7 @@ jobs:
         echo "::set-output name=cache-key::$CACHE_KEY"
         echo "::set-output name=cache-path::$CACHE_PATH"
 
-    # TODO Test with pipenv branch
+    # TODO Re-test with poetry and python (pip) branches
     - name: Load cached venv
       id: cache
       uses: actions/cache@v2
@@ -232,7 +231,7 @@ jobs:
         cache-from: type=registry,ref=ghcr.io/${{ steps.get-repo.outputs.repo }}:latest
         cache-to: type=registry,ref=ghcr.io/${{ steps.get-repo.outputs.repo }}:latest,mode=max
 
-    # https://github.com/docker/build-push-action/blob/master/docs/advanced/local-registry.md
+    # TODO Parametrize config file
     - name: Analyze image efficiency
       uses: MartinHeinz/dive-action@v0.0.3
       with:
