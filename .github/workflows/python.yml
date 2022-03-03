@@ -229,8 +229,8 @@ jobs:
         # For GHCR only - https://github.com/docker/build-push-action/blob/master/docs/advanced/cache.md#cache-backend-api
         # cache-from: type=gha
         # cache-to: type=gha,mode=max
-        cache-from: type=registry,ref=${{ steps.get-repo.outputs.repo }}:latest
-        cache-to: type=registry,ref=${{ steps.get-repo.outputs.repo }}:latest,mode=max
+        cache-from: type=registry,ref=ghcr.io/${{ steps.get-repo.outputs.repo }}:latest
+        cache-to: type=registry,ref=ghcr.io/${{ steps.get-repo.outputs.repo }}:latest,mode=max
 
     # TODO - https://github.com/wagoodman/dive
     # TODO Create Task
