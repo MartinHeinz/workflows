@@ -86,13 +86,6 @@ jobs:
       with:
         python-version: ${{ inputs.PYTHON_VERSION }}
 
-    - name: Install Poetry
-      uses: snok/install-poetry@v1
-      if: ${{ inputs.DEPENDENCY_MANAGER == 'poetry' }}
-      with:
-        virtualenvs-create: false
-        virtualenvs-in-project: true
-
     - name: Get cache metadata
       id: cache-meta
       run: |
@@ -111,6 +104,14 @@ jobs:
         fi
         echo "::set-output name=cache-key::$CACHE_KEY"
         echo "::set-output name=cache-path::$CACHE_PATH"
+
+    - name: Install Poetry
+      uses: snok/install-poetry@v1
+      if: ${{ inputs.DEPENDENCY_MANAGER == 'poetry' }}
+      with:
+        virtualenvs-create: false
+        virtualenvs-in-project: true
+        virtualenvs-path: ${{ steps.cache-meta.outputs.cache-path }}
 
     # TODO Re-test with poetry
     - name: Load cached venv
