@@ -268,7 +268,7 @@ jobs:
     - name: Trivy vulnerability scan
       uses: aquasecurity/trivy-action@master
       with:
-        image-ref: '${{ inputs.CONTAINER_REGISTRY }}
+        image-ref: '${{ inputs.CONTAINER_REGISTRY }}'
         output: 'trivy-results.sarif'
 
     - name: Push container image
