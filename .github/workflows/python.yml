@@ -67,10 +67,6 @@ on:
         required: false
         type: string
         default: ''
-      CONTAINER_IMAGE:
-        required: false
-        type: string
-        default: ''
     secrets:
       CONTAINER_REGISTRY_USERNAME:
         description: 'Username for container registry'
@@ -225,7 +221,7 @@ jobs:
           USERNAME=${{ github.actor }}
           PASSWORD=${{ secrets.GITHUB_TOKEN }}
         else
-          REPO=${{ inputs.CONTAINER_REPOSITORY }}/${{ inputs.CONTAINER_IMAGE }}
+          REPO=${{ inputs.CONTAINER_REPOSITORY }}
           USERNAME=${{ secrets.CONTAINER_REGISTRY_USERNAME }}
           PASSWORD=${{ secrets.CONTAINER_REGISTRY_PASSWORD }}
         fi
