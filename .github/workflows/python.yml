@@ -129,11 +129,11 @@ jobs:
         python -m venv venv
         source venv/bin/activate
         pip install pylint flake8 bandit pytest pytest-cov
-        if [ inputs.DEPENDENCY_MANAGER = 'pip' ]; then
+        if [ ${{ inputs.DEPENDENCY_MANAGER }} = 'pip' ]; then
           pip install -r requirements.txt;
-        elif [ inputs.DEPENDENCY_MANAGER = 'poetry' ]; then
+        elif [ ${{ inputs.DEPENDENCY_MANAGER }} = 'poetry' ]; then
           poetry install
-        elif [ inputs.DEPENDENCY_MANAGER = 'pipenv' ]; then
+        elif [ ${{ inputs.DEPENDENCY_MANAGER }} = 'pipenv' ]; then
           pip install pipenv
           pipenv install
         fi
