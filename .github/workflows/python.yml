@@ -11,7 +11,7 @@ on:
         required: false
         type: string
         default: '3.10'
-      DEPENDENCY_MANAGER:  # TODO Make this into list option
+      DEPENDENCY_MANAGER:
         required: false
         type: string
         default: 'pip'  # or poetry, pipenv
@@ -50,6 +50,10 @@ on:
       # Will by default scan `.` if you want to configure it otherwise use `targets` stanza in config file
       # Important: Make sure to exclude `./venv` from scan paths!
       BANDIT_CONFIG:
+        required: false
+        type: string
+        default: ''
+      DIVE_CONFIG:
         required: false
         type: string
         default: ''
@@ -231,11 +235,11 @@ jobs:
         cache-from: type=registry,ref=ghcr.io/${{ steps.get-repo.outputs.repo }}:latest
         cache-to: type=registry,ref=ghcr.io/${{ steps.get-repo.outputs.repo }}:latest,mode=max
 
-    # TODO Parametrize config file
     - name: Analyze image efficiency
-      uses: MartinHeinz/dive-action@v0.0.3
+      uses: MartinHeinz/dive-action@v0.1.0
       with:
         image: 'ghcr.io/${{ steps.get-repo.outputs.repo }}:${{ steps.meta.outputs.version }}'
+        config: ${{ inputs.DIVE_CONFIG }}
 
     - name: Trivy vulnerability scan
       uses: aquasecurity/trivy-action@master
