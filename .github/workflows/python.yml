@@ -72,6 +72,9 @@ on:
       CONTAINER_REGISTRY_PASSWORD:
         description: 'Password for container registry'
         required: false
+      SONAR_TOKEN:
+        description: 'SonarCloud project token'
+        required: false
       CC_TEST_REPORTER_ID:
         description: 'CodeClimate Test Reported ID'
         required: false
