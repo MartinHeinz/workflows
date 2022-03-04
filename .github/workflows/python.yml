@@ -1,7 +1,4 @@
-name: Python CI job
-
-# Inputs:
-# - Push destination (Opt., Default to current repo registry)
+name: Python CI Pipeline
 
 on:
   workflow_call:
@@ -62,11 +59,11 @@ on:
       CONTAINER_REGISTRY:
         required: false
         type: string
-        default: 'ghcr.io'
+        default: 'ghcr.io'  # 'docker.io'
       CONTAINER_REPOSITORY:
         required: false
         type: string
-        default: ''
+        default: ''  # in case of Docker Hub: username/image-name
     secrets:
       CONTAINER_REGISTRY_USERNAME:
         description: 'Username for container registry'
@@ -244,7 +241,6 @@ jobs:
       id: meta
       uses: docker/metadata-action@v3
       with:
-        # list of Docker images to use as base name for tags
         images: |
            ${{ inputs.CONTAINER_REGISTRY }}/${{ steps.get-repo.outputs.repo }}
         tags: |
@@ -258,9 +254,6 @@ jobs:
         load: true
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
-        # For GHCR only - https://github.com/docker/build-push-action/blob/master/docs/advanced/cache.md#cache-backend-api
-        # cache-from: type=gha
-        # cache-to: type=gha,mode=max
         cache-from: type=registry,ref=${{ inputs.CONTAINER_REGISTRY }}/${{ steps.get-repo.outputs.repo }}:latest
         cache-to: type=registry,ref=${{ inputs.CONTAINER_REGISTRY }}/${{ steps.get-repo.outputs.repo }}:latest,mode=max
 
