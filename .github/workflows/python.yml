@@ -189,7 +189,7 @@ jobs:
         source venv/bin/activate
         BANDIT_CONDITIONAL_ARGS=()
         if [ -n "${{ inputs.BANDIT_CONFIG }}" ]; then
-          BANDIT_CONDITIONAL_ARGS+=( --ini ${{ inputs.BANDIT_CONFIG }} )  # TODO Should `. --exclude ./venv` be added here too?
+          BANDIT_CONDITIONAL_ARGS+=( --exclude ./venv --ini ${{ inputs.BANDIT_CONFIG }} )
         else
           BANDIT_CONDITIONAL_ARGS+=( . --exclude ./venv )
         fi
@@ -266,7 +266,6 @@ jobs:
       with:
         image: '${{ inputs.CONTAINER_REGISTRY }}/${{ steps.get-repo.outputs.repo }}:${{ steps.meta.outputs.version }}'
         config: ${{ inputs.DIVE_CONFIG }}
-        # TODO Test
         exit-zero: ${{ !inputs.ENFORCE_DIVE }}
 
     - name: Trivy vulnerability scan
