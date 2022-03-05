@@ -36,6 +36,10 @@ on:
         required: false
         type: boolean
         default: true
+      ENFORCE_DIVE:
+        required: false
+        type: boolean
+        default: true
       ENFORCE_BANDIT:
         required: false
         type: boolean
@@ -185,7 +189,7 @@ jobs:
         source venv/bin/activate
         BANDIT_CONDITIONAL_ARGS=()
         if [ -n "${{ inputs.BANDIT_CONFIG }}" ]; then
-          BANDIT_CONDITIONAL_ARGS+=( --ini ${{ inputs.BANDIT_CONFIG }} )
+          BANDIT_CONDITIONAL_ARGS+=( --ini ${{ inputs.BANDIT_CONFIG }} )  # TODO Should `. --exclude ./venv` be added here too?
         else
           BANDIT_CONDITIONAL_ARGS+=( . --exclude ./venv )
         fi
@@ -258,10 +262,12 @@ jobs:
         cache-to: type=registry,ref=${{ inputs.CONTAINER_REGISTRY }}/${{ steps.get-repo.outputs.repo }}:latest,mode=max
 
     - name: Analyze image efficiency
-      uses: MartinHeinz/dive-action@v0.1.0
+      uses: MartinHeinz/dive-action@v0.1.3
       with:
         image: '${{ inputs.CONTAINER_REGISTRY }}/${{ steps.get-repo.outputs.repo }}:${{ steps.meta.outputs.version }}'
         config: ${{ inputs.DIVE_CONFIG }}
+        # TODO Test
+        exit-zero: ${{ !inputs.ENFORCE_DIVE }}
 
     - name: Trivy vulnerability scan
       uses: aquasecurity/trivy-action@master
