@@ -1,8 +1,7 @@
-name: Python CI Pipeline
+name: Python Container CI Pipeline
 
 on:
   workflow_call:
-    # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#onworkflow_callinputs
     inputs:
       PYTHON_VERSION:
         required: false
