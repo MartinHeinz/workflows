@@ -1,5 +1,9 @@
 # GitHub Action Reusable Workflows
 
+You can find more information about this project/repository and how to use it in following blog post:
+
+- [Ultimate CI Pipeline for All of Your Python Projects](https://martinheinz.dev/blog/69)
+
 ## Configure Sonar
 
 - Go to <https://github.com/settings/installations/>, Click _Configure_ next to SonarCloud App
